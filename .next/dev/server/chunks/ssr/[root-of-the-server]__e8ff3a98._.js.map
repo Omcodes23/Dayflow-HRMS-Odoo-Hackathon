@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 10, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/omvat/OneDrive/Desktop/Dayflow/components/Providers.tsx"],"sourcesContent":["'use client'\r\n\r\nimport { ThemeProvider } from 'next-themes'\r\n\r\nexport function Providers({ children }: { children: React.ReactNode }) {\r\n  return (\r\n    <ThemeProvider\r\n      attribute=\"class\"\r\n      defaultTheme=\"light\"\r\n      enableSystem\r\n      disableTransitionOnChange\r\n    >\r\n      {children}\r\n    </ThemeProvider>\r\n  )\r\n}\r\n"],"names":[],"mappings":";;;;;AAEA;AAFA;;;AAIO,SAAS,UAAU,EAAE,QAAQ,EAAiC;IACnE,qBACE,8OAAC,iKAAa;QACZ,WAAU;QACV,cAAa;QACb,YAAY;QACZ,yBAAyB;kBAExB;;;;;;AAGP"}}]
-}
