@@ -40,8 +40,15 @@ export default function SignInPage() {
       // Set cookies for server-side auth
       document.cookie = `accessToken=${data.accessToken}; path=/; max-age=${60 * 15}`; // 15 min
       document.cookie = `refreshToken=${data.refreshToken}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
-      toast.success('Welcome back!');
-      router.push('/dashboard');
+      
+      // Check if user must change password
+      if (data.mustChangePassword) {
+        toast.info('Please set a new password for your account.');
+        router.push('/change-password');
+      } else {
+        toast.success('Welcome back!');
+        router.push('/dashboard');
+      }
     },
     onError: (err) => {
       setError(err.message);

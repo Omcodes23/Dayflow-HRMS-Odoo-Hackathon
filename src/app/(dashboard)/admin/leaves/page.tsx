@@ -61,13 +61,14 @@ type LeaveRequest = {
   reason: string;
   status: string;
   employee: {
+    firstName: string;
+    lastName: string;
     user: {
-      firstName: string;
-      lastName: string;
       email: string;
+      employeeId: string;
     };
     department: {
-      name: string;
+      departmentName: string;
     } | null;
   };
 };
@@ -112,8 +113,8 @@ function AdminLeavesContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Leave Management</h1>
-        <p className="text-gray-500">Review and manage employee leave requests</p>
+        <h1 className="text-2xl font-bold text-foreground">Leave Management</h1>
+        <p className="text-muted-foreground">Review and manage employee leave requests</p>
       </div>
 
       {/* Stats */}
@@ -125,8 +126,8 @@ function AdminLeavesContent() {
                 <Calendar className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Total Requests</p>
-                <p className="text-2xl font-bold">{leaves?.length || 0}</p>
+                <p className="text-sm text-muted-foreground">Total Requests</p>
+                <p className="text-2xl font-bold text-foreground">{leaves?.length || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -138,8 +139,8 @@ function AdminLeavesContent() {
                 <Clock className="h-5 w-5 text-yellow-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Pending</p>
-                <p className="text-2xl font-bold">{pendingCount}</p>
+                <p className="text-sm text-muted-foreground">Pending</p>
+                <p className="text-2xl font-bold text-foreground">{pendingCount}</p>
               </div>
             </div>
           </CardContent>
@@ -151,8 +152,8 @@ function AdminLeavesContent() {
                 <CheckCircle className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Approved</p>
-                <p className="text-2xl font-bold">{approvedCount}</p>
+                <p className="text-sm text-muted-foreground">Approved</p>
+                <p className="text-2xl font-bold text-foreground">{approvedCount}</p>
               </div>
             </div>
           </CardContent>
@@ -164,8 +165,8 @@ function AdminLeavesContent() {
                 <XCircle className="h-5 w-5 text-red-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Rejected</p>
-                <p className="text-2xl font-bold">{rejectedCount}</p>
+                <p className="text-sm text-muted-foreground">Rejected</p>
+                <p className="text-2xl font-bold text-foreground">{rejectedCount}</p>
               </div>
             </div>
           </CardContent>
@@ -176,7 +177,7 @@ function AdminLeavesContent() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-500">Filter by status:</span>
+            <span className="text-sm text-muted-foreground">Filter by status:</span>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-40">
                 <SelectValue />
@@ -208,8 +209,8 @@ function AdminLeavesContent() {
             </div>
           ) : filteredLeaves?.length === 0 ? (
             <div className="text-center py-12">
-              <Calendar className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-              <p className="text-gray-500">No leave requests found</p>
+              <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No leave requests found</p>
             </div>
           ) : (
             <Table>
@@ -231,16 +232,16 @@ function AdminLeavesContent() {
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="text-xs">
-                            {leave.employee.user.firstName[0]}
-                            {leave.employee.user.lastName[0]}
+                            {leave.employee.firstName?.[0] || ''}
+                            {leave.employee.lastName?.[0] || ''}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium text-sm">
-                            {leave.employee.user.firstName} {leave.employee.user.lastName}
+                          <p className="font-medium text-sm text-foreground">
+                            {leave.employee.firstName || ''} {leave.employee.lastName || ''}
                           </p>
-                          <p className="text-xs text-gray-500">
-                            {leave.employee.department?.name || 'No dept'}
+                          <p className="text-xs text-muted-foreground">
+                            {leave.employee.department?.departmentName || 'No dept'}
                           </p>
                         </div>
                       </div>
@@ -286,7 +287,7 @@ function AdminLeavesContent() {
             <DialogDescription>
               {selectedLeave && (
                 <>
-                  {selectedLeave.employee.user.firstName} {selectedLeave.employee.user.lastName}{' '}
+                  {selectedLeave.employee.firstName || ''} {selectedLeave.employee.lastName || ''}{' '}
                   requested {selectedLeave.daysRequested} day(s) of {selectedLeave.leaveType} leave
                 </>
               )}
@@ -297,26 +298,26 @@ function AdminLeavesContent() {
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-500">Start Date:</span>
-                  <p className="font-medium">
+                  <span className="text-muted-foreground">Start Date:</span>
+                  <p className="font-medium text-foreground">
                     {format(new Date(selectedLeave.startDate), 'MMM d, yyyy')}
                   </p>
                 </div>
                 <div>
-                  <span className="text-gray-500">End Date:</span>
-                  <p className="font-medium">
+                  <span className="text-muted-foreground">End Date:</span>
+                  <p className="font-medium text-foreground">
                     {format(new Date(selectedLeave.endDate), 'MMM d, yyyy')}
                   </p>
                 </div>
               </div>
 
               <div>
-                <span className="text-sm text-gray-500">Reason:</span>
-                <p className="mt-1 p-3 bg-gray-50 rounded-lg text-sm">{selectedLeave.reason}</p>
+                <span className="text-sm text-muted-foreground">Reason:</span>
+                <p className="mt-1 p-3 bg-muted rounded-lg text-sm text-foreground">{selectedLeave.reason}</p>
               </div>
 
               <div className="space-y-2">
-                <span className="text-sm text-gray-500">Decision:</span>
+                <span className="text-sm text-muted-foreground">Decision:</span>
                 <div className="flex gap-2">
                   <Button
                     variant={reviewAction === 'APPROVED' ? 'default' : 'outline'}
@@ -346,7 +347,7 @@ function AdminLeavesContent() {
               </div>
 
               <div className="space-y-2">
-                <span className="text-sm text-gray-500">Comment (optional):</span>
+                <span className="text-sm text-muted-foreground">Comment (optional):</span>
                 <Textarea
                   placeholder="Add a comment for the employee..."
                   value={reviewComment}
@@ -382,7 +383,7 @@ function AdminLeavesContent() {
 
 export default function AdminLeavesPage() {
   return (
-    <RoleGuard allowedRoles={['ADMIN', 'HR']}>
+    <RoleGuard allowedRoles={['WEBSITE_ADMIN', 'COMPANY_ADMIN', 'HR']}>
       <AdminLeavesContent />
     </RoleGuard>
   );

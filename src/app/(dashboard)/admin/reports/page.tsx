@@ -32,8 +32,9 @@ import {
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { motion } from 'framer-motion';
 import { formatINR } from '@/lib/utils/currency';
+import { RoleGuard } from '@/components/auth/RoleGuard';
 
-export default function AdminReportsPage() {
+function AdminReportsContent() {
   const [selectedPeriod, setSelectedPeriod] = useState('current-month');
 
   const now = new Date();
@@ -532,5 +533,13 @@ export default function AdminReportsPage() {
         </Tabs>
       </motion.div>
     </motion.div>
+  );
+}
+
+export default function AdminReportsPage() {
+  return (
+    <RoleGuard allowedRoles={['WEBSITE_ADMIN', 'COMPANY_ADMIN', 'HR']}>
+      <AdminReportsContent />
+    </RoleGuard>
   );
 }

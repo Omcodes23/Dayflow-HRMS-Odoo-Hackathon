@@ -16,6 +16,7 @@ import {
   ArrowRight,
   Building,
   Briefcase,
+  FileText,
   Bell,
 } from 'lucide-react';
 
@@ -92,7 +93,7 @@ const stats = [
   { value: '24/7', label: 'Support' },
 ];
 
-export default function Home() {
+export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}

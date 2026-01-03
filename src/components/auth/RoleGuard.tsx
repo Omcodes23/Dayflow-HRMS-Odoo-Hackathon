@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ShieldX, Home, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-type UserRole = 'EMPLOYEE' | 'MANAGER' | 'HR' | 'ADMIN';
+type UserRole = 'EMPLOYEE' | 'MANAGER' | 'HR' | 'COMPANY_ADMIN' | 'WEBSITE_ADMIN';
 
 interface RoleGuardProps {
   children: React.ReactNode;
@@ -19,19 +19,22 @@ interface RoleGuardProps {
 // Define route role requirements
 export const routeRoles: Record<string, UserRole[]> = {
   // Employee routes - all roles
-  '/dashboard': ['EMPLOYEE', 'MANAGER', 'HR', 'ADMIN'],
-  '/profile': ['EMPLOYEE', 'MANAGER', 'HR', 'ADMIN'],
-  '/attendance': ['EMPLOYEE', 'MANAGER', 'HR', 'ADMIN'],
-  '/leaves': ['EMPLOYEE', 'MANAGER', 'HR', 'ADMIN'],
-  '/payroll': ['EMPLOYEE', 'MANAGER', 'HR', 'ADMIN'],
-  '/settings': ['EMPLOYEE', 'MANAGER', 'HR', 'ADMIN'],
+  '/dashboard': ['EMPLOYEE', 'MANAGER', 'HR', 'COMPANY_ADMIN', 'WEBSITE_ADMIN'],
+  '/profile': ['EMPLOYEE', 'MANAGER', 'HR', 'COMPANY_ADMIN', 'WEBSITE_ADMIN'],
+  '/attendance': ['EMPLOYEE', 'MANAGER', 'HR', 'COMPANY_ADMIN', 'WEBSITE_ADMIN'],
+  '/leaves': ['EMPLOYEE', 'MANAGER', 'HR', 'COMPANY_ADMIN', 'WEBSITE_ADMIN'],
+  '/payroll': ['EMPLOYEE', 'MANAGER', 'HR', 'COMPANY_ADMIN', 'WEBSITE_ADMIN'],
+  '/settings': ['EMPLOYEE', 'MANAGER', 'HR', 'COMPANY_ADMIN', 'WEBSITE_ADMIN'],
   
   // Admin and HR routes
-  '/admin/employees': ['HR', 'ADMIN'],
-  '/admin/leaves': ['HR', 'ADMIN'],
-  '/admin/attendance': ['HR', 'ADMIN'],
-  '/admin/payroll': ['HR', 'ADMIN'],
-  '/admin/reports': ['HR', 'ADMIN'],
+  '/admin/employees': ['HR', 'COMPANY_ADMIN', 'WEBSITE_ADMIN'],
+  '/admin/leaves': ['HR', 'COMPANY_ADMIN', 'WEBSITE_ADMIN'],
+  '/admin/attendance': ['HR', 'COMPANY_ADMIN', 'WEBSITE_ADMIN'],
+  '/admin/payroll': ['HR', 'COMPANY_ADMIN', 'WEBSITE_ADMIN'],
+  '/admin/reports': ['HR', 'COMPANY_ADMIN', 'WEBSITE_ADMIN'],
+  
+  // Website Admin only routes
+  '/website-admin': ['WEBSITE_ADMIN'],
 };
 
 export function RoleGuard({ children, allowedRoles, fallback }: RoleGuardProps) {
@@ -105,15 +108,16 @@ export function useRole() {
 
   return {
     role: userRole,
-    isAdmin: userRole === 'ADMIN',
+    isWebsiteAdmin: userRole === 'WEBSITE_ADMIN',
+    isCompanyAdmin: userRole === 'COMPANY_ADMIN',
     isHR: userRole === 'HR',
     isManager: userRole === 'MANAGER',
     isEmployee: userRole === 'EMPLOYEE',
-    hasAdminAccess: userRole === 'ADMIN' || userRole === 'HR',
-    canManageEmployees: userRole === 'ADMIN' || userRole === 'HR',
-    canApproveLeaves: userRole === 'ADMIN' || userRole === 'HR' || userRole === 'MANAGER',
-    canViewReports: userRole === 'ADMIN' || userRole === 'HR',
-    canManagePayroll: userRole === 'ADMIN' || userRole === 'HR',
+    hasAdminAccess: userRole === 'WEBSITE_ADMIN' || userRole === 'COMPANY_ADMIN' || userRole === 'HR',
+    canManageEmployees: userRole === 'WEBSITE_ADMIN' || userRole === 'COMPANY_ADMIN' || userRole === 'HR',
+    canApproveLeaves: userRole === 'WEBSITE_ADMIN' || userRole === 'COMPANY_ADMIN' || userRole === 'HR' || userRole === 'MANAGER',
+    canViewReports: userRole === 'WEBSITE_ADMIN' || userRole === 'COMPANY_ADMIN' || userRole === 'HR',
+    canManagePayroll: userRole === 'WEBSITE_ADMIN' || userRole === 'COMPANY_ADMIN' || userRole === 'HR',
   };
 }
 

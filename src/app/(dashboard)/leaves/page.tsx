@@ -41,19 +41,19 @@ import { toast } from 'sonner';
 import Link from 'next/link';
 
 const statusColors: Record<string, string> = {
-  PENDING: 'bg-yellow-100 text-yellow-700',
-  APPROVED: 'bg-green-100 text-green-700',
-  REJECTED: 'bg-red-100 text-red-700',
-  CANCELLED: 'bg-gray-100 text-gray-700',
+  PENDING: 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300',
+  APPROVED: 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300',
+  REJECTED: 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300',
+  CANCELLED: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300',
 };
 
 const leaveTypeColors: Record<string, string> = {
-  PAID: 'bg-blue-100 text-blue-700',
-  SICK: 'bg-red-100 text-red-700',
-  CASUAL: 'bg-purple-100 text-purple-700',
-  UNPAID: 'bg-gray-100 text-gray-700',
-  MATERNITY: 'bg-pink-100 text-pink-700',
-  PATERNITY: 'bg-teal-100 text-teal-700',
+  PAID: 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300',
+  SICK: 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300',
+  CASUAL: 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300',
+  UNPAID: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300',
+  MATERNITY: 'bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300',
+  PATERNITY: 'bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300',
 };
 
 export default function LeavesPage() {
@@ -112,8 +112,8 @@ export default function LeavesPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Leave Management</h1>
-          <p className="text-gray-500">Apply for leave and track your requests</p>
+          <h1 className="text-2xl font-bold text-foreground">Leave Management</h1>
+          <p className="text-muted-foreground">Apply for leave and track your requests</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -164,8 +164,8 @@ export default function LeavesPage() {
               </div>
 
               {daysRequested > 0 && (
-                <p className="text-sm text-gray-600">
-                  Requesting <span className="font-semibold">{daysRequested}</span> day(s)
+                <p className="text-sm text-muted-foreground">
+                  Requesting <span className="font-semibold text-foreground">{daysRequested}</span> day(s)
                 </p>
               )}
 
@@ -221,13 +221,13 @@ export default function LeavesPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <Badge className={leaveTypeColors[balance.leaveType]}>{balance.leaveType}</Badge>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-muted-foreground">
                       {balance.used} / {balance.totalAllocated}
                     </span>
                   </div>
-                  <p className="text-2xl font-bold text-gray-900">{balance.remaining}</p>
-                  <p className="text-sm text-gray-500">days remaining</p>
-                  <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <p className="text-2xl font-bold text-foreground">{balance.remaining}</p>
+                  <p className="text-sm text-muted-foreground">days remaining</p>
+                  <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden">
                     <div
                       className={`h-full ${
                         percentage > 50
@@ -268,8 +268,8 @@ export default function LeavesPage() {
             </div>
           ) : leaves?.length === 0 ? (
             <div className="text-center py-12">
-              <Calendar className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-              <p className="text-gray-500">No leave requests yet</p>
+              <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No leave requests yet</p>
               <Button className="mt-4" onClick={() => setIsDialogOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
                 Apply for Leave

@@ -25,7 +25,7 @@ export const createEmployeeSchema = z.object({
   firstName: z.string().min(2),
   lastName: z.string().min(2),
   phone: z.string().optional(),
-  role: z.enum(['EMPLOYEE', 'MANAGER', 'HR', 'ADMIN']).default('EMPLOYEE'),
+  role: z.enum(['EMPLOYEE', 'MANAGER', 'HR', 'COMPANY_ADMIN', 'WEBSITE_ADMIN']).default('EMPLOYEE'),
   departmentId: z.string().uuid().optional(),
   designationId: z.string().uuid().optional(),
   employmentType: z.enum(['FULL_TIME', 'PART_TIME', 'CONTRACT', 'INTERN']).default('FULL_TIME'),

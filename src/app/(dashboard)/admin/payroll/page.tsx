@@ -37,20 +37,21 @@ import { IndianRupee, Users, Edit, TrendingUp, Wallet, Search } from 'lucide-rea
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { formatINR } from '@/lib/utils/currency';
+import { RoleGuard } from '@/components/auth/RoleGuard';
 
 type Employee = {
   id: string;
-  employeeId: string;
+  firstName: string;
+  lastName: string;
   user: {
-    firstName: string;
-    lastName: string;
     email: string;
+    employeeId: string;
   };
   department: {
-    name: string;
+    departmentName: string;
   } | null;
   designation: {
-    title: string;
+    designationName: string;
   } | null;
   salary: {
     basicSalary: number;
@@ -65,7 +66,7 @@ type Employee = {
   } | null;
 };
 
-export default function AdminPayrollPage() {
+function AdminPayrollContent() {
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [search, setSearch] = useState('');
   const [salaryData, setSalaryData] = useState({
@@ -162,10 +163,10 @@ export default function AdminPayrollPage() {
 
   const filteredEmployees = (employees as Employee[] | undefined)?.filter(
     (e) =>
-      e.user.firstName.toLowerCase().includes(search.toLowerCase()) ||
-      e.user.lastName.toLowerCase().includes(search.toLowerCase()) ||
-      e.user.email.toLowerCase().includes(search.toLowerCase()) ||
-      e.employeeId.toLowerCase().includes(search.toLowerCase())
+      (e.firstName?.toLowerCase() || '').includes(search.toLowerCase()) ||
+      (e.lastName?.toLowerCase() || '').includes(search.toLowerCase()) ||
+      (e.user?.email?.toLowerCase() || '').includes(search.toLowerCase()) ||
+      (e.user?.employeeId?.toLowerCase() || '').includes(search.toLowerCase())
   );
 
   const totalPayroll = filteredEmployees?.reduce(
@@ -293,23 +294,23 @@ export default function AdminPayrollPage() {
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="text-xs">
-                            {employee.user.firstName[0]}
-                            {employee.user.lastName[0]}
+                            {employee.firstName?.[0] || ''}
+                            {employee.lastName?.[0] || ''}
                           </AvatarFallback>
                         </Avatar>
                         <div>
                           <p className="font-medium text-sm">
-                            {employee.user.firstName} {employee.user.lastName}
+                            {employee.firstName || ''} {employee.lastName || ''}
                           </p>
-                          <p className="text-xs text-gray-500">{employee.employeeId}</p>
+                          <p className="text-xs text-gray-500">{employee.user?.employeeId || ''}</p>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">
-                      {employee.department?.name || '-'}
+                      {employee.department?.departmentName || '-'}
                     </TableCell>
                     <TableCell className="text-sm">
-                      {employee.designation?.title || '-'}
+                      {employee.designation?.designationName || '-'}
                     </TableCell>
                     <TableCell className="text-sm font-medium">
                       {employee.salary
@@ -354,8 +355,8 @@ export default function AdminPayrollPage() {
             <DialogDescription>
               {selectedEmployee && (
                 <>
-                  {selectedEmployee.user.firstName} {selectedEmployee.user.lastName} (
-                  {selectedEmployee.employeeId})
+                  {selectedEmployee.firstName || ''} {selectedEmployee.lastName || ''} (
+                  {selectedEmployee.user?.employeeId || ''})
                 </>
               )}
             </DialogDescription>
@@ -528,5 +529,13 @@ export default function AdminPayrollPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function AdminPayrollPage() {
+  return (
+    <RoleGuard allowedRoles={['WEBSITE_ADMIN', 'COMPANY_ADMIN', 'HR']}>
+      <AdminPayrollContent />
+    </RoleGuard>
   );
 }

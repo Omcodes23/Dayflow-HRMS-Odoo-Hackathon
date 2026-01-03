@@ -46,22 +46,57 @@ const statusColors: Record<string, string> = {
 };
 
 const roleColors: Record<string, string> = {
-  ADMIN: 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300',
+  WEBSITE_ADMIN: 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300',
+  COMPANY_ADMIN: 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300',
   HR: 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300',
   MANAGER: 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300',
   EMPLOYEE: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300',
 };
 
+// Generate random password
+function generateRandomPassword(length = 12): string {
+  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+  const numbers = '0123456789';
+  const special = '@#$%&*!';
+  const all = uppercase + lowercase + numbers + special;
+  
+  let password = '';
+  password += uppercase[Math.floor(Math.random() * uppercase.length)];
+  password += lowercase[Math.floor(Math.random() * lowercase.length)];
+  password += numbers[Math.floor(Math.random() * numbers.length)];
+  password += special[Math.floor(Math.random() * special.length)];
+  
+  for (let i = password.length; i < length; i++) {
+    password += all[Math.floor(Math.random() * all.length)];
+  }
+  
+  return password.split('').sort(() => Math.random() - 0.5).join('');
+}
+
+// Get display role name
+function getDisplayRole(role: string): string {
+  switch (role) {
+    case 'WEBSITE_ADMIN': return 'Website Admin';
+    case 'COMPANY_ADMIN': return 'Company Admin';
+    case 'HR': return 'HR Manager';
+    case 'MANAGER': return 'Manager';
+    case 'EMPLOYEE': return 'Employee';
+    default: return role;
+  }
+}
+
 function AdminEmployeesContent() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [generatedPassword, setGeneratedPassword] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     firstName: '',
     lastName: '',
     phone: '',
-    role: 'EMPLOYEE' as 'ADMIN' | 'HR' | 'MANAGER' | 'EMPLOYEE',
+    role: 'EMPLOYEE' as 'WEBSITE_ADMIN' | 'COMPANY_ADMIN' | 'HR' | 'MANAGER' | 'EMPLOYEE',
     departmentId: '',
     designationId: '',
     employmentType: 'FULL_TIME' as 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERN',
@@ -71,9 +106,10 @@ function AdminEmployeesContent() {
   const { data: employees, isLoading, refetch } = trpc.employee.getAll.useQuery();
   const createEmployee = trpc.employee.create.useMutation({
     onSuccess: () => {
-      toast.success('Employee created successfully!');
+      toast.success(`Employee created successfully! Temporary password: ${generatedPassword}`);
       setIsAddOpen(false);
       refetch();
+      setGeneratedPassword('');
       setFormData({
         email: '',
         password: '',
@@ -118,14 +154,22 @@ function AdminEmployeesContent() {
   });
 
   const handleSubmit = () => {
-    if (!formData.email || !formData.password || !formData.firstName || !formData.lastName) {
+    if (!formData.email || !formData.firstName || !formData.lastName) {
       toast.error('Please fill all required fields');
       return;
     }
 
+    // Generate password if not set
+    let password = formData.password;
+    if (!password) {
+      password = generateRandomPassword();
+      setGeneratedPassword(password);
+      setFormData({ ...formData, password });
+    }
+
     createEmployee.mutate({
       email: formData.email,
-      password: formData.password,
+      password: password,
       firstName: formData.firstName,
       lastName: formData.lastName,
       phone: formData.phone || undefined,
@@ -139,18 +183,18 @@ function AdminEmployeesContent() {
 
   const filteredEmployees = employees?.filter(
     (e) =>
-      e.user.firstName.toLowerCase().includes(search.toLowerCase()) ||
-      e.user.lastName.toLowerCase().includes(search.toLowerCase()) ||
-      e.user.email.toLowerCase().includes(search.toLowerCase()) ||
-      e.employeeId.toLowerCase().includes(search.toLowerCase())
+      (e.firstName?.toLowerCase() || '').includes(search.toLowerCase()) ||
+      (e.lastName?.toLowerCase() || '').includes(search.toLowerCase()) ||
+      (e.user?.email?.toLowerCase() || '').includes(search.toLowerCase()) ||
+      (e.user?.employeeId?.toLowerCase() || '').includes(search.toLowerCase())
   );
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Employees</h1>
-          <p className="text-gray-500">Manage all employees in the organization</p>
+          <h1 className="text-2xl font-bold text-foreground">Employees</h1>
+          <p className="text-muted-foreground">Manage all employees in the organization</p>
         </div>
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
@@ -191,13 +235,33 @@ function AdminEmployeesContent() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password *</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                />
+                <Label htmlFor="password">Password (Auto-generated)</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="password"
+                    type="text"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    placeholder="Click Generate or enter manually"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      const pwd = generateRandomPassword();
+                      setGeneratedPassword(pwd);
+                      setFormData({ ...formData, password: pwd });
+                    }}
+                  >
+                    Generate
+                  </Button>
+                </div>
+                {formData.password && (
+                  <p className="text-xs text-muted-foreground">
+                    User will be required to change password on first login
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone</Label>
@@ -211,7 +275,7 @@ function AdminEmployeesContent() {
                 <Label htmlFor="role">Role *</Label>
                 <Select
                   value={formData.role}
-                  onValueChange={(value: 'ADMIN' | 'HR' | 'MANAGER' | 'EMPLOYEE') =>
+                  onValueChange={(value: 'WEBSITE_ADMIN' | 'COMPANY_ADMIN' | 'HR' | 'MANAGER' | 'EMPLOYEE') =>
                     setFormData({ ...formData, role: value })
                   }
                 >
@@ -221,8 +285,9 @@ function AdminEmployeesContent() {
                   <SelectContent>
                     <SelectItem value="EMPLOYEE">Employee</SelectItem>
                     <SelectItem value="MANAGER">Manager</SelectItem>
-                    <SelectItem value="HR">HR</SelectItem>
-                    <SelectItem value="ADMIN">Admin</SelectItem>
+                    <SelectItem value="HR">HR Manager</SelectItem>
+                    <SelectItem value="COMPANY_ADMIN">Company Admin</SelectItem>
+                    <SelectItem value="WEBSITE_ADMIN">Website Admin</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -327,8 +392,8 @@ function AdminEmployeesContent() {
                 <Users className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Total</p>
-                <p className="text-2xl font-bold">{employees?.length || 0}</p>
+                <p className="text-sm text-muted-foreground">Total</p>
+                <p className="text-2xl font-bold text-foreground">{employees?.length || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -340,8 +405,8 @@ function AdminEmployeesContent() {
                 <Users className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Active</p>
-                <p className="text-2xl font-bold">
+                <p className="text-sm text-muted-foreground">Active</p>
+                <p className="text-2xl font-bold text-foreground">
                   {employees?.filter((e) => e.employmentStatus === 'ACTIVE').length || 0}
                 </p>
               </div>
@@ -355,8 +420,8 @@ function AdminEmployeesContent() {
                 <Users className="h-5 w-5 text-yellow-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">On Leave</p>
-                <p className="text-2xl font-bold">
+                <p className="text-sm text-muted-foreground">On Leave</p>
+                <p className="text-2xl font-bold text-foreground">
                   {employees?.filter((e) => e.employmentStatus === 'ON_LEAVE').length || 0}
                 </p>
               </div>
@@ -370,8 +435,8 @@ function AdminEmployeesContent() {
                 <Building className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Departments</p>
-                <p className="text-2xl font-bold">{departments?.length || 0}</p>
+                <p className="text-sm text-muted-foreground">Departments</p>
+                <p className="text-2xl font-bold text-foreground">{departments?.length || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -395,8 +460,8 @@ function AdminEmployeesContent() {
             </div>
           ) : filteredEmployees?.length === 0 ? (
             <div className="text-center py-12">
-              <Users className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-              <p className="text-gray-500">No employees found</p>
+              <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No employees found</p>
             </div>
           ) : (
             <Table>
@@ -418,33 +483,33 @@ function AdminEmployeesContent() {
                       <div className="flex items-center gap-3">
                         <Avatar>
                           <AvatarFallback>
-                            {employee.user.firstName[0]}
-                            {employee.user.lastName[0]}
+                            {employee.firstName?.[0] || ''}
+                            {employee.lastName?.[0] || ''}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium">
-                            {employee.user.firstName} {employee.user.lastName}
+                          <p className="font-medium text-foreground">
+                            {employee.firstName || ''} {employee.lastName || ''}
                           </p>
-                          <p className="text-sm text-gray-500">{employee.user.email}</p>
+                          <p className="text-sm text-muted-foreground">{employee.user?.email || ''}</p>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono">{employee.employeeId}</TableCell>
+                    <TableCell className="font-mono">{employee.user?.employeeId || ''}</TableCell>
                     <TableCell>
-                      <Badge className={roleColors[employee.user.role]}>
-                        {employee.user.role}
+                      <Badge className={roleColors[employee.user?.role] || roleColors.EMPLOYEE}>
+                        {getDisplayRole(employee.user?.role || 'EMPLOYEE')}
                       </Badge>
                     </TableCell>
-                    <TableCell>{employee.department?.name || '-'}</TableCell>
-                    <TableCell>{employee.designation?.title || '-'}</TableCell>
+                    <TableCell>{employee.department?.departmentName || '-'}</TableCell>
+                    <TableCell>{employee.designation?.designationName || '-'}</TableCell>
                     <TableCell>
                       <Badge className={statusColors[employee.employmentStatus]}>
-                        {employee.employmentStatus.replace('_', ' ')}
+                        {employee.employmentStatus?.replace('_', ' ') || '-'}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {format(new Date(employee.joinDate), 'MMM d, yyyy')}
+                      {employee.joinDate ? format(new Date(employee.joinDate), 'MMM d, yyyy') : '-'}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -459,7 +524,7 @@ function AdminEmployeesContent() {
 
 export default function AdminEmployeesPage() {
   return (
-    <RoleGuard allowedRoles={['ADMIN', 'HR']}>
+    <RoleGuard allowedRoles={['WEBSITE_ADMIN', 'COMPANY_ADMIN', 'HR']}>
       <AdminEmployeesContent />
     </RoleGuard>
   );

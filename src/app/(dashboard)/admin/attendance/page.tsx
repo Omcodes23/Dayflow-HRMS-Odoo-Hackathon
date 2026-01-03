@@ -183,20 +183,20 @@ function AdminAttendanceContent() {
                         <div className="flex items-center gap-3">
                           <Avatar className="h-8 w-8">
                             <AvatarFallback className="text-xs">
-                              {employee.user.firstName[0]}
-                              {employee.user.lastName[0]}
+                              {employee.firstName?.[0] || ''}
+                              {employee.lastName?.[0] || ''}
                             </AvatarFallback>
                           </Avatar>
                           <div>
                             <p className="font-medium text-sm">
-                              {employee.user.firstName} {employee.user.lastName}
+                              {employee.firstName || ''} {employee.lastName || ''}
                             </p>
-                            <p className="text-xs text-gray-500">{employee.employeeId}</p>
+                            <p className="text-xs text-gray-500">{employee.user?.employeeId || ''}</p>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell className="text-sm">
-                        {employee.department?.name || '-'}
+                        {employee.department?.departmentName || '-'}
                       </TableCell>
                       <TableCell className="text-center">
                         <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
@@ -261,7 +261,7 @@ function AdminAttendanceContent() {
 
 export default function AdminAttendancePage() {
   return (
-    <RoleGuard allowedRoles={['ADMIN', 'HR']}>
+    <RoleGuard allowedRoles={['WEBSITE_ADMIN', 'COMPANY_ADMIN', 'HR']}>
       <AdminAttendanceContent />
     </RoleGuard>
   );

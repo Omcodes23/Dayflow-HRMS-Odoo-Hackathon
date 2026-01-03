@@ -18,7 +18,8 @@ enum UserRole {
   EMPLOYEE
   MANAGER
   HR
-  ADMIN
+  COMPANY_ADMIN
+  WEBSITE_ADMIN
 }
 
 enum AccountStatus {
@@ -87,6 +88,7 @@ model User {
   passwordHash             String        @map("password_hash")
   role                     UserRole      @default(EMPLOYEE)
   accountStatus            AccountStatus @default(PENDING_VERIFICATION) @map("account_status")
+  mustChangePassword       Boolean       @default(false) @map("must_change_password")
   emailVerified            Boolean       @default(false) @map("email_verified")
   emailVerificationToken   String?       @map("email_verification_token")
   emailVerificationExpires DateTime?     @map("email_verification_expires")

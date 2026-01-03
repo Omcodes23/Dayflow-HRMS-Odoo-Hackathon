@@ -4,17 +4,17 @@ import type { NextRequest } from 'next/server';
 // Define public routes that don't require authentication
 const publicRoutes = ['/', '/signin', '/signup', '/forgot-password', '/reset-password'];
 
-// Define admin-only routes
+// Define admin-only routes (Website Admin and Company Admin)
 const adminRoutes = ['/admin'];
 
-// Define HR routes (accessible by HR and Admin)
+// Define HR routes (accessible by HR, Company Admin, and Website Admin)
 const hrRoutes = ['/admin/leaves', '/admin/employees', '/admin/attendance', '/admin/payroll', '/admin/reports'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // Allow public routes
-  if (publicRoutes.some((route) => pathname === route || pathname.startsWith('/api'))) {
+  // Allow public routes and API routes
+  if (publicRoutes.some((route) => pathname === route) || pathname.startsWith('/api')) {
     return NextResponse.next();
   }
 

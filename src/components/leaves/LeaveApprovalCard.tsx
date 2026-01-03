@@ -98,7 +98,7 @@ export function LeaveApprovalCard({ request, onAction }: LeaveApprovalCardProps)
     });
   };
 
-  const initials = `${request.employee.firstName[0]}${request.employee.lastName[0]}`;
+  const initials = `${request.employee.firstName?.[0] || ''}${request.employee.lastName?.[0] || ''}`;
   const daysDiff = differenceInDays(new Date(request.endDate), new Date(request.startDate)) + 1;
 
   return (

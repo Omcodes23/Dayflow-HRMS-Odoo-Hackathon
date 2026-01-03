@@ -199,6 +199,7 @@ export const employeeRouter = router({
         role: input.role,
         accountStatus: 'ACTIVE',
         emailVerified: true,
+        mustChangePassword: true,
         employee: {
           create: {
             firstName: input.firstName,
@@ -299,6 +300,106 @@ export const employeeRouter = router({
   getDesignations: protectedProcedure.query(async ({ ctx }) => {
     return ctx.prisma.designation.findMany({
       orderBy: { level: 'asc' },
+      include: {
+        _count: {
+          select: { employees: true },
+        },
+      },
     });
   }),
+
+  // Create designation (HR and COMPANY_ADMIN only)
+  createDesignation: protectedProcedure
+    .input(
+      z.object({
+        designationName: z.string().min(1, 'Designation name is required'),
+        description: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Check if user has permission
+      if (!['HR', 'COMPANY_ADMIN'].includes(ctx.user.role)) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'Only HR and Company Admin can create designations',
+        });
+      }
+
+      // Get the highest level to increment
+      const highestDesignation = await ctx.prisma.designation.findFirst({
+        orderBy: { level: 'desc' },
+      });
+
+      const designation = await ctx.prisma.designation.create({
+        data: {
+          designationName: input.designationName,
+          description: input.description,
+          level: (highestDesignation?.level || 0) + 1,
+          createdById: ctx.user.id,
+        },
+      });
+
+      return designation;
+    }),
+
+  // Update designation (HR and COMPANY_ADMIN only)
+  updateDesignation: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        designationName: z.string().min(1, 'Designation name is required').optional(),
+        description: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Check if user has permission
+      if (!['HR', 'COMPANY_ADMIN'].includes(ctx.user.role)) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'Only HR and Company Admin can update designations',
+        });
+      }
+
+      const { id, ...data } = input;
+      const designation = await ctx.prisma.designation.update({
+        where: { id },
+        data: {
+          ...data,
+          updatedById: ctx.user.id,
+        },
+      });
+
+      return designation;
+    }),
+
+  // Delete designation (HR and COMPANY_ADMIN only)
+  deleteDesignation: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      // Check if user has permission
+      if (!['HR', 'COMPANY_ADMIN'].includes(ctx.user.role)) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'Only HR and Company Admin can delete designations',
+        });
+      }
+
+      // Check if designation is being used
+      const employeeCount = await ctx.prisma.employee.count({
+        where: { designationId: input.id },
+      });
+
+      if (employeeCount > 0) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: `Cannot delete designation. ${employeeCount} employee(s) are assigned to this designation.`,
+        });
+      }
+
+      await ctx.prisma.designation.delete({
+        where: { id: input.id },
+      });
+
+      return { success: true };
+    }),
 });

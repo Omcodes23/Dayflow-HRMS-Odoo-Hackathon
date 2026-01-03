@@ -168,6 +168,7 @@ export const authRouter = router({
     return {
       accessToken,
       refreshToken,
+      mustChangePassword: user.mustChangePassword,
       user: {
         id: user.id,
         email: user.email,
@@ -243,6 +244,56 @@ export const authRouter = router({
       role: user.role,
       employeeId: user.employeeId,
       employee: user.employee,
+      mustChangePassword: user.mustChangePassword,
     };
   }),
+
+  changePassword: protectedProcedure
+    .input(z.object({
+      currentPassword: z.string().optional(),
+      newPassword: z.string().min(8),
+      confirmPassword: z.string().min(8),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      if (input.newPassword !== input.confirmPassword) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'New passwords do not match',
+        });
+      }
+
+      const user = await ctx.prisma.user.findUnique({
+        where: { id: ctx.user.id },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'User not found',
+        });
+      }
+
+      // If not first login (mustChangePassword), verify current password
+      if (!user.mustChangePassword && input.currentPassword) {
+        const isValidPassword = await verifyPassword(input.currentPassword, user.passwordHash);
+        if (!isValidPassword) {
+          throw new TRPCError({
+            code: 'UNAUTHORIZED',
+            message: 'Current password is incorrect',
+          });
+        }
+      }
+
+      const newPasswordHash = await hashPassword(input.newPassword);
+
+      await ctx.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          passwordHash: newPasswordHash,
+          mustChangePassword: false,
+        },
+      });
+
+      return { success: true };
+    }),
 });

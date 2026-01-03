@@ -28,7 +28,7 @@ const isAuthenticated = t.middleware(({ ctx, next }) => {
 });
 
 const isAdmin = t.middleware(({ ctx, next }) => {
-  if (!ctx.user || (ctx.user.role !== 'ADMIN' && ctx.user.role !== 'HR')) {
+  if (!ctx.user || (ctx.user.role !== 'WEBSITE_ADMIN' && ctx.user.role !== 'COMPANY_ADMIN' && ctx.user.role !== 'HR')) {
     throw new TRPCError({
       code: 'FORBIDDEN',
       message: 'You do not have permission to perform this action',

@@ -138,8 +138,40 @@ async function main() {
   console.log('✅ Leave policies created');
 
   const adminPassword = await bcrypt.hash('Admin@123', 12);
+  const websiteAdminPassword = await bcrypt.hash('WebAdmin@123', 12);
   const hrPassword = await bcrypt.hash('Hr@123456', 12);
   const empPassword = await bcrypt.hash('Employee@1', 12);
+
+  // Create Website Admin user (Platform level admin)
+  const websiteAdmin = await prisma.user.upsert({
+    where: { email: 'webadmin@dayflow.com' },
+    update: {},
+    create: {
+      employeeId: 'EMP000',
+      email: 'webadmin@dayflow.com',
+      passwordHash: websiteAdminPassword,
+      role: 'WEBSITE_ADMIN',
+      accountStatus: 'ACTIVE',
+      emailVerified: true,
+      mustChangePassword: false,
+      employee: {
+        create: {
+          firstName: 'Website',
+          lastName: 'Admin',
+          phone: '+1234567800',
+          gender: 'Male',
+          joinDate: new Date('2019-01-01'),
+          employmentType: 'FULL_TIME',
+          employmentStatus: 'ACTIVE',
+          departmentId: departments[0].id,
+          designationId: designations[3].id,
+        },
+      },
+    },
+    include: { employee: true },
+  });
+
+  console.log('✅ Website Admin user created');
 
   // Create Admin user
   const admin = await prisma.user.upsert({
@@ -149,12 +181,13 @@ async function main() {
       employeeId: 'EMP001',
       email: 'admin@dayflow.com',
       passwordHash: adminPassword,
-      role: 'ADMIN',
+      role: 'COMPANY_ADMIN',
       accountStatus: 'ACTIVE',
       emailVerified: true,
+      mustChangePassword: false,
       employee: {
         create: {
-          firstName: 'Super',
+          firstName: 'Company',
           lastName: 'Admin',
           phone: '+1234567890',
           gender: 'Male',
@@ -169,7 +202,7 @@ async function main() {
     include: { employee: true },
   });
 
-  console.log('✅ Admin user created');
+  console.log('✅ Company Admin user created');
 
   // Create HR user
   const hr = await prisma.user.upsert({
@@ -182,6 +215,7 @@ async function main() {
       role: 'HR',
       accountStatus: 'ACTIVE',
       emailVerified: true,
+      mustChangePassword: false,
       employee: {
         create: {
           firstName: 'Sarah',
@@ -225,6 +259,7 @@ async function main() {
         role: 'EMPLOYEE',
         accountStatus: 'ACTIVE',
         emailVerified: true,
+        mustChangePassword: false,
         employee: {
           create: {
             firstName: emp.firstName,
@@ -248,7 +283,7 @@ async function main() {
   console.log('✅ Employees created');
 
   // Create leave balances for all users
-  const allUsers = [admin, hr, ...employees];
+  const allUsers = [websiteAdmin, admin, hr, ...employees];
   const currentYear = new Date().getFullYear();
   const leavePolicies = await prisma.leavePolicy.findMany();
 
@@ -278,6 +313,7 @@ async function main() {
 
   // Create salary structures
   const salaries = [
+    { userId: websiteAdmin.id, basic: 20000 },
     { userId: admin.id, basic: 15000 },
     { userId: hr.id, basic: 8000 },
     ...employees.map((e, i) => ({ userId: e.id, basic: 5000 + i * 500 })),
@@ -393,7 +429,8 @@ async function main() {
 
   console.log('\n🎉 Database seeding completed successfully!');
   console.log('\n📝 Test Accounts:');
-  console.log('  Admin: admin@dayflow.com / Admin@123');
+  console.log('  Website Admin: webadmin@dayflow.com / WebAdmin@123');
+  console.log('  Company Admin: admin@dayflow.com / Admin@123');
   console.log('  HR: hr@dayflow.com / Hr@123456');
   console.log('  Employee: john.doe@dayflow.com / Employee@1');
 }

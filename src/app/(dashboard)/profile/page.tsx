@@ -43,15 +43,15 @@ export default function ProfilePage() {
     );
   }
 
-  const initials = `${profile.firstName[0]}${profile.lastName[0]}`;
+  const initials = `${profile.firstName?.[0] || ''}${profile.lastName?.[0] || ''}`;
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
-          <p className="text-gray-500">Manage your personal information</p>
+          <h1 className="text-2xl font-bold text-foreground">My Profile</h1>
+          <p className="text-muted-foreground">Manage your personal information</p>
         </div>
         <Link href="/profile/edit">
           <Button>
@@ -71,10 +71,10 @@ export default function ProfilePage() {
               </AvatarFallback>
             </Avatar>
             <div className="text-center md:text-left flex-1">
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-foreground">
                 {profile.firstName} {profile.middleName || ''} {profile.lastName}
               </h2>
-              <p className="text-gray-500">{profile.designation?.designationName || 'Employee'}</p>
+              <p className="text-muted-foreground">{profile.designation?.designationName || 'Employee'}</p>
               <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-2">
                 <Badge variant="secondary">{profile.user?.employeeId}</Badge>
                 <Badge variant="outline">{profile.department?.departmentName || 'Unassigned'}</Badge>
@@ -90,8 +90,8 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="text-center md:text-right">
-              <p className="text-sm text-gray-500">Member since</p>
-              <p className="font-medium">{format(new Date(profile.joinDate), 'MMM yyyy')}</p>
+              <p className="text-sm text-muted-foreground">Member since</p>
+              <p className="font-medium text-foreground">{format(new Date(profile.joinDate), 'MMM yyyy')}</p>
             </div>
           </div>
         </CardContent>
@@ -108,26 +108,26 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3">
-              <Mail className="h-4 w-4 text-gray-400" />
+              <Mail className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-sm text-gray-500">Email</p>
-                <p className="font-medium">{profile.user?.email}</p>
+                <p className="text-sm text-muted-foreground">Email</p>
+                <p className="font-medium text-foreground">{profile.user?.email}</p>
               </div>
             </div>
             <Separator />
             <div className="flex items-center gap-3">
-              <Phone className="h-4 w-4 text-gray-400" />
+              <Phone className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-sm text-gray-500">Phone</p>
-                <p className="font-medium">{profile.phone || 'Not provided'}</p>
+                <p className="text-sm text-muted-foreground">Phone</p>
+                <p className="font-medium text-foreground">{profile.phone || 'Not provided'}</p>
               </div>
             </div>
             <Separator />
             <div className="flex items-center gap-3">
-              <Calendar className="h-4 w-4 text-gray-400" />
+              <Calendar className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-sm text-gray-500">Date of Birth</p>
-                <p className="font-medium">
+                <p className="text-sm text-muted-foreground">Date of Birth</p>
+                <p className="font-medium text-foreground">
                   {profile.dateOfBirth
                     ? format(new Date(profile.dateOfBirth), 'MMMM d, yyyy')
                     : 'Not provided'}
@@ -136,10 +136,10 @@ export default function ProfilePage() {
             </div>
             <Separator />
             <div className="flex items-center gap-3">
-              <User className="h-4 w-4 text-gray-400" />
+              <User className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-sm text-gray-500">Gender</p>
-                <p className="font-medium">{profile.gender || 'Not provided'}</p>
+                <p className="text-sm text-muted-foreground">Gender</p>
+                <p className="font-medium text-foreground">{profile.gender || 'Not provided'}</p>
               </div>
             </div>
           </CardContent>
@@ -155,42 +155,42 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3">
-              <Building className="h-4 w-4 text-gray-400" />
+              <Building className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-sm text-gray-500">Department</p>
-                <p className="font-medium">{profile.department?.departmentName || 'Unassigned'}</p>
+                <p className="text-sm text-muted-foreground">Department</p>
+                <p className="font-medium text-foreground">{profile.department?.departmentName || 'Unassigned'}</p>
               </div>
             </div>
             <Separator />
             <div className="flex items-center gap-3">
-              <Briefcase className="h-4 w-4 text-gray-400" />
+              <Briefcase className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-sm text-gray-500">Designation</p>
-                <p className="font-medium">{profile.designation?.designationName || 'Not assigned'}</p>
+                <p className="text-sm text-muted-foreground">Designation</p>
+                <p className="font-medium text-foreground">{profile.designation?.designationName || 'Not assigned'}</p>
               </div>
             </div>
             <Separator />
             <div className="flex items-center gap-3">
-              <Calendar className="h-4 w-4 text-gray-400" />
+              <Calendar className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-sm text-gray-500">Join Date</p>
-                <p className="font-medium">{format(new Date(profile.joinDate), 'MMMM d, yyyy')}</p>
+                <p className="text-sm text-muted-foreground">Join Date</p>
+                <p className="font-medium text-foreground">{format(new Date(profile.joinDate), 'MMMM d, yyyy')}</p>
               </div>
             </div>
             <Separator />
             <div className="flex items-center gap-3">
-              <User className="h-4 w-4 text-gray-400" />
+              <User className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-sm text-gray-500">Employment Type</p>
-                <p className="font-medium">{profile.employmentType.replace('_', ' ')}</p>
+                <p className="text-sm text-muted-foreground">Employment Type</p>
+                <p className="font-medium text-foreground">{profile.employmentType.replace('_', ' ')}</p>
               </div>
             </div>
             <Separator />
             <div className="flex items-center gap-3">
-              <User className="h-4 w-4 text-gray-400" />
+              <User className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-sm text-gray-500">Reporting Manager</p>
-                <p className="font-medium">
+                <p className="text-sm text-muted-foreground">Reporting Manager</p>
+                <p className="font-medium text-foreground">
                   {profile.reportingManager
                     ? `${profile.reportingManager.firstName} ${profile.reportingManager.lastName}`
                     : 'Not assigned'}
@@ -210,7 +210,7 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent>
             {profile.addressLine1 ? (
-              <div className="space-y-1">
+              <div className="space-y-1 text-foreground">
                 <p>{profile.addressLine1}</p>
                 {profile.addressLine2 && <p>{profile.addressLine2}</p>}
                 <p>
@@ -219,7 +219,7 @@ export default function ProfilePage() {
                 <p>{profile.country}</p>
               </div>
             ) : (
-              <p className="text-gray-500">No address provided</p>
+              <p className="text-muted-foreground">No address provided</p>
             )}
           </CardContent>
         </Card>
@@ -236,16 +236,16 @@ export default function ProfilePage() {
             {profile.emergencyContactName ? (
               <div className="space-y-2">
                 <div>
-                  <p className="text-sm text-gray-500">Name</p>
-                  <p className="font-medium">{profile.emergencyContactName}</p>
+                  <p className="text-sm text-muted-foreground">Name</p>
+                  <p className="font-medium text-foreground">{profile.emergencyContactName}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Phone</p>
-                  <p className="font-medium">{profile.emergencyContactPhone}</p>
+                  <p className="text-sm text-muted-foreground">Phone</p>
+                  <p className="font-medium text-foreground">{profile.emergencyContactPhone}</p>
                 </div>
               </div>
             ) : (
-              <p className="text-gray-500">No emergency contact provided</p>
+              <p className="text-muted-foreground">No emergency contact provided</p>
             )}
           </CardContent>
         </Card>
@@ -258,7 +258,7 @@ export default function ProfilePage() {
             <CardTitle>About</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-600">{profile.bio}</p>
+            <p className="text-muted-foreground">{profile.bio}</p>
           </CardContent>
         </Card>
       )}
