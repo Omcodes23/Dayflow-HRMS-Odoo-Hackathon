@@ -613,25 +613,7 @@ We welcome contributions! Please follow these steps:
 
 ---
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- [Next.js](https://nextjs.org/) - The React Framework
-- [Prisma](https://www.prisma.io/) - Next-generation ORM
-- [shadcn/ui](https://ui.shadcn.com/) - Beautiful UI components
-- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS
-- [tRPC](https://trpc.io/) - End-to-end typesafe APIs
-
----
-
 <div align="center">
-
-**Built with ❤️ by the Dayflow Team**
 
 [⬆ Back to Top](#-dayflow---human-resource-management-system)
 
